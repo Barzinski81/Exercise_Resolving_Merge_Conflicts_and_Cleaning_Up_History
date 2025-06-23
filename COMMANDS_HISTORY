@@ -1,0 +1,161 @@
+# Problem 1
+
+$ echo "Initial line" > app.txt
+
+$ git add .
+
+$ git commit -m "Intial commit"
+[main (root-commit) 376e9f5] Intial commit
+ 1 file changed, 1 insertion(+)
+ create mode 100644 app.txt
+
+$ git checkout -b conflict-branch
+Switched to a new branch 'conflict-branch'
+
+$ echo "Change from the conflict-branch" > app.txt
+
+$ git commit -am "Update from the conflict branch"
+warning: in the working copy of 'app.txt', LF will be replaced by CRLF the next time Git touches it
+[conflict-branch 9a76cc4] Update from the conflict branch
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+$ git checkout main
+Switched to branch 'main'
+
+$ echo "Change from main" > app.txt
+
+$ git commit -am "Update from the main branch"
+warning: in the working copy of 'app.txt', LF will be replaced by CRLF the next time Git touches it
+[main 6fe2b07] Update from the main branch
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+$ git merge conflict-branch
+Auto-merging app.txt
+CONFLICT (content): Merge conflict in app.txt
+Automatic merge failed; fix conflicts and then commit the result.
+
+$ vim app.txt
+
+$ git commit -m "Merge conflict resolved"
+[main 617fd97] Merge conflict resolved
+
+$ git log --oneline --graph
+*   617fd97 (HEAD -> main) Merge conflict resolved
+|\
+| * 9a76cc4 (conflict-branch) Update from the conflict branch
+* | 6fe2b07 Update from the main branch
+|/
+* 376e9f5 Intial commit
+
+# Problem 2
+
+$ echo "Initial content" > notes.txt
+
+$ git add .
+
+$ git commit -m "Added the notes.txt file with the initial content"
+[main 41c5b54] Added the notes.txt file with the initial content
+ 1 file changed, 1 insertion(+)
+ create mode 100644 notes.txt
+
+$ git checkout -b rebase-cleanup
+Switched to a new branch 'rebase-cleanup'
+
+$ echo "First change" >> notes.txt
+
+$ git commit -am "First change in notes.txt"
+
+$ echo "Second change" >> notes.txt
+
+$ git commit -am "Second change in notes.txt"
+
+$ echo "Third change" >> notes.txt
+
+$ git commit -am "Third change in notes.txt"
+
+$ git rebase -i HEAD~3
+
+[detached HEAD eb34a76] Initial change in notes.txt
+ Date: Mon Jun 23 09:03:08 2025 +0300
+ 1 file changed, 3 insertions(+)
+Successfully rebased and updated refs/heads/rebase-cleanup.
+
+$ git log --oneline
+eb34a76 (HEAD -> rebase-cleanup) Initial change in notes.txt
+41c5b54 (main) Added the notes.txt file with the initial content
+617fd97 Merge conflict resolved
+6fe2b07 Update from the main branch
+9a76cc4 (conflict-branch) Update from the conflict branch
+376e9f5 Intial commit
+
+$ git checkout main
+Switched to branch 'main'
+
+$ git merge rebase-cleanup
+Updating 41c5b54..eb34a76
+Fast-forward
+ notes.txt | 3 +++
+ 1 file changed, 3 insertions(+)
+
+$ git log --oneline
+eb34a76 (HEAD -> main, rebase-cleanup) Initial change in notes.txt
+41c5b54 Added the notes.txt file with the initial content
+617fd97 Merge conflict resolved
+6fe2b07 Update from the main branch
+9a76cc4 (conflict-branch) Update from the conflict branch
+376e9f5 Intial commit
+
+
+# Problem 3
+
+$ echo "Main branch content" > rebase.txt
+
+$ git add rebase.txt
+
+$ git commit -m "Initial rebase.txt. content"
+[main 8fe06c1] Initial rebase.txt. content
+ 1 file changed, 1 insertion(+)
+ create mode 100644 rebase.txt
+
+$ git checkout -b feature-rebase
+Switched to a new branch 'feature-rebase'
+
+$ echo "Feature branch change" > rebase.txt
+
+$ git commit -am "feature-rebase branch change in rebase.txt"
+[feature-rebase a8d3253] feature-rebase branch change in rebase.txt
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+$ git checkout main
+Switched to branch 'main'
+
+$ echo "Update of the main branch content" > rebase.txt
+
+$ git commit -am "Update of the main branch content"
+
+$ git checkout feature-rebase
+
+$ vim rebase.txt
+
+$ git add rebase.txt
+
+$ git rebase --continue
+
+[detached HEAD 1d73ad9] feature-rebase branch change in rebase.txt
+ 1 file changed, 1 insertion(+)
+Successfully rebased and updated refs/heads/feature-rebase.
+
+$ git log --oneline --graph
+* 1d73ad9 (HEAD -> feature-rebase) feature-rebase branch change in rebase.txt
+* 0ec8ba0 (main) Update of the main branch content
+* 8fe06c1 Initial rebase.txt. content
+* eb34a76 (rebase-cleanup) Initial change in notes.txt
+* 41c5b54 Added the notes.txt file with the initial content
+*   617fd97 Merge conflict resolved
+|\
+| * 9a76cc4 (conflict-branch) Update from the conflict branch
+* | 6fe2b07 Update from the main branch
+|/
+* 376e9f5 Intial commit
+
+
